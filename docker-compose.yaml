@@ -1,0 +1,58 @@
+version: '1.1'
+
+networks:
+  mynetwork:
+    driver: bridge
+
+volumes:
+  media:
+
+
+services:
+
+  cache:
+    image: redis
+    restart: always
+    volumes:
+      - ./data/cache:/data
+
+  db:
+    image: postgres
+    restart: always
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=instant_message_db
+      - POSTGRES_USER=dmitrii
+      - POSTGRES_PASSWORD=strong-admin-password
+      - POSTGRES_PORT=5432
+    networks:
+      - mynetwork
+
+
+  web:
+    build: .
+    depends_on:
+      - db
+    ports:
+      - '5050:5050'
+    networks:
+      - mynetwork
+    volumes:
+      - ./app:/app
+      - media:/app/media
+
+
+  nginx:
+    container_name: nginx
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./app/static:/usr/share/nginx/html/static
+      - ./app/templates:/usr/share/nginx/html/templates
+    depends_on:
+      - web
+    networks:
+      - mynetwork
