@@ -1,10 +1,14 @@
-from fastapi import FastAPI, Request, Response
+from typing import List
+from fastapi import FastAPI, Request, Response, WebSocket, WebSocketDisconnect
 from contextlib import asynccontextmanager
 
 from starlette.staticfiles import StaticFiles
 
 from database import engine, Base, SessionLocal
 from fastapi.templating import Jinja2Templates
+from chat.router import router as router_chat
+
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -34,3 +38,5 @@ async def root(request: Request):
 async def say_hello(name: str):
     return {"message": f"Hello {name}"}
 
+
+app.include_router(router_chat)
