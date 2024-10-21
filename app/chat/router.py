@@ -2,6 +2,7 @@ from typing import List
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter, Response, Request
 
 from fastapi.templating import Jinja2Templates
+
 templates = Jinja2Templates(directory="templates")
 
 
