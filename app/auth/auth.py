@@ -1,8 +1,6 @@
-from fastapi_users.authentication import CookieTransport
 import redis.asyncio
-from fastapi_users.authentication import RedisStrategy
-from fastapi_users.authentication import AuthenticationBackend
 from fastapi_users import FastAPIUsers
+from fastapi_users.authentication import CookieTransport, RedisStrategy, AuthenticationBackend
 
 from .models import User
 from .manager import get_user_manager
@@ -18,7 +16,7 @@ cookie_transport = CookieTransport(
 
 redis = redis.asyncio.from_url(
     "redis://cache:6379",
-    decode_responses=True
+    decode_responses=False
 )
 
 def get_redis_strategy() -> RedisStrategy:

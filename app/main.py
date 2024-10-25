@@ -13,15 +13,23 @@ from auth.models import User
 
 from templates_config import templates
 
+from contextlib import asynccontextmanager
+
+
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+
+from redis import asyncio as aioredis
+from fastapi_cache.decorator import cache
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # async with engine.begin() as conn:
-    #     await conn.run_sync(Base.metadata.drop_all)
-        # await conn.run_sync(Base.metadata.create_all, checkfirst=True)
+    redis = aioredis.from_url("redis://cache:6379")
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     yield
     await SessionLocal().close()
     await engine.dispose()
-
 
 app = FastAPI(lifespan=lifespan)
 app.mount("/static", StaticFiles(directory="static"), name="static")

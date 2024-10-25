@@ -17,7 +17,7 @@
     <a class="active" href="{{ url_for('home') }}">Home</a>
     {% if user %}
     	<a href="/profile">Your profile</a>
-      <a href="/chat">Chat</a>
+      <a href="/chat">Chats</a>
       <a href="/logout">Log out</a>
     {% else %}
       <a href="/login">Login</a>
@@ -27,5 +27,29 @@
   {% block content %}
   	
   {% endblock %}
+  <div id="toast" class="toast"></div>
+
+  <script>
+      function showToast(message, type = 'error') {
+          const toast = document.getElementById('toast');
+          toast.textContent = message;
+          toast.className = `toast ${type} show`;
+
+          setTimeout(() => {
+              toast.className = 'toast';
+          }, 5000);
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+          const message = '{{ request.headers.get("X-Message", "") }}';
+          const messageType = '{{ request.headers.get("X-Message-Type", "") }}';
+
+          if (message) {
+              showToast(message, messageType);
+          }
+      });
+  </script>
+
+
 </body>
 </html>
