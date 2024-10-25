@@ -7,14 +7,13 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-# импортируем ваши модели и конфигурацию
 from database import Base
 from config import DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER
-import auth.models  # импортируем модели
+import auth.models
+import chat.models
 
 config = context.config
 
-# Используем asyncpg вместо psycopg2
 DB_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 config.set_main_option("sqlalchemy.url", DB_URL)
 
