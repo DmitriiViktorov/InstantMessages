@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Chat with User {{ other_user_id }}
+{% endblock %}
+
+{% block content %}
+    <h1>Chat with User {{ other_user_id }}</h1>
+    <div id="chat-container">
+        <div id="messages">
+            {% for message in messages %}
+                <div class="message {% if message.sender_id == current_user_id %}sent{% else %}received{% endif %}">
+                    <span class="message-user">{{ current_user_id }}</span>
+                    <span class="message-content">{{ message.message }}</span>
+                    <span class="message-time">{{ message.created_at.strftime('%H:%M') }}</span>
+                </div>
+            {% endfor %}
+        </div>
+        <form id="message-form" onsubmit="sendMessage(event)">
+            <input type="text" id="messageText" autocomplete="off"/>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        const currentUserId = {{ current_user_id }};
+        const otherUserId = {{ other_user_id }};
+
+        const ws = new WebSocket(
+            `ws://localhost:80/chat/ws/${currentUserId}/${otherUserId}`
+        );
+
+        const messagesDiv = document.getElementById('messages');
+
+        ws.onmessage = function(event) {
+            const messageDiv = document.createElement('div');
+            const [userId, ...messageParts] = event.data.split(': ');
+            const messageContent = messageParts.join(': ');
+
+            messageDiv.className = `message ${userId === `User ${currentUserId}` ? 'sent' : 'received'}`;
+
+            const contentSpan = document.createElement('span');
+            contentSpan.className = 'message-content';
+            contentSpan.textContent = messageContent;
+
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'message-time';
+            timeSpan.textContent = new Date().toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            messageDiv.appendChild(contentSpan);
+            messageDiv.appendChild(timeSpan);
+            messagesDiv.appendChild(messageDiv);
+
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        };
+
+        function sendMessage(event) {
+            event.preventDefault();
+            const input = document.getElementById("messageText");
+            if (input.value.trim()) {
+                ws.send(input.value);
+                input.value = '';
+            }
+        }
+
+        window.onload = function() {
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+    </script>
+
+{% endblock %}

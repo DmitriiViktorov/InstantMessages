@@ -1,15 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-</head>
-<body>
-  <h1>Hello user</h1>
+{% extends "base.html" %}
+
+{% block title %}
+	Homepage
+{% endblock %}
+
+{% block content %}
+  {% if user %}
+    <h1>Hello {{ user.full_name }}</h1>
+  {% else %}
+    <h1>Hello user</h1>
+  {% endif %}
+
   <p>Здесь мы пробуем добавить данные из контекста</p>
   <br>
   <p>
     Если вы видите здесь {{ id }} == 1 верное равенство - значит все хорошо
   </p>
-</body>
-</html>
+{% endblock %}

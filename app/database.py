@@ -1,3 +1,5 @@
+from typing import AsyncGenerator
+
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 
@@ -13,3 +15,9 @@ SessionLocal = async_sessionmaker(
     autoflush=True,
 )
 Base = declarative_base()
+
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """Get Session with the current database."""
+    async with SessionLocal() as db:
+        yield db
+

@@ -1,0 +1,44 @@
+#chat-container {
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+#messages {
+    height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.message {
+    margin: 10px 0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    max-width: 70%;
+}
+
+.sent {
+    background-color: #dcf8c6;
+    margin-left: auto;
+}
+
+.received {
+    background-color: #e8e8e8;
+}
+
+.message-time {
+    font-size: 0.8em;
+    color: #666;
+    margin-left: 8px;
+}
+
+#message-form {
+    display: flex;
+    gap: 10px;
+}
+
+#messageText {
+    flex-grow: 1;
+    padding: 8px;
+}

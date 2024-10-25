@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Logout
+{% endblock %}
+
+{% block content %}
+  <h1>Logout</h1>
+
+  <div id="error-message" class="error-message" style="display: none;"></div>
+
+  <form id="logout-form" onsubmit="handleSubmit(event)">
+    <p>Are you sure you want to log out?</p>
+
+    <button type="submit">
+      LOG OUT
+    </button>
+  </form>
+
+  <p>Don't have an account? <a href="/register">Register here.</a></p>
+
+  <script>
+    async function handleSubmit(event) {
+      event.preventDefault();
+
+      const errorDiv = document.getElementById('error-message');
+
+      try {
+        const response = await fetch('/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        });
+
+        if (response.ok) {
+          window.location.href = '/';
+        } else {
+          const data = await response.json();
+          errorDiv.textContent = data.detail || 'Log out failed';
+          errorDiv.style.display = 'block';
+        }
+      } catch (error) {
+        errorDiv.textContent = 'An error occurred during log out';
+        errorDiv.style.display = 'block';
+      }
+    }
+  </script>
+{% endblock %}
