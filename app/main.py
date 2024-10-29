@@ -1,10 +1,9 @@
 from typing import Optional
 from fastapi import FastAPI, Request, Depends
-from contextlib import asynccontextmanager
 
 from starlette.staticfiles import StaticFiles
 
-from database import engine, Base, SessionLocal
+from database import engine, SessionLocal
 from chat.router import router as router_chat
 from auth.router import router as auth_router
 from auth.auth import auth_backend, fastapi_users
@@ -20,7 +19,6 @@ from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 
 from redis import asyncio as aioredis
-from fastapi_cache.decorator import cache
 
 
 @asynccontextmanager

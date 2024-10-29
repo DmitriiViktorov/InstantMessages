@@ -12,3 +12,5 @@ DB_PASS = os.environ.get("DB_PASS")
 
 AUTH_SECRET = os.environ.get("AUTH_SECRET")
 PASSWORD_RESET = os.environ.get("PASSWORD_RESET")
+
+BOT_TOKEN = os.environ.get("BOT_TOKEN")

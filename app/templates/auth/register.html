@@ -29,8 +29,8 @@
       <input type="text" id="last_name" name="last_name" required>
     </div>
     <div>
-      <label for="nick_name">Nickname</label>
-      <input type="text" id="nick_name" name="nick_name" required>
+      <label for="telegram_account">Telegram account</label>
+      <input type="text" id="telegram_account" name="telegram_account" required>
     </div>
 
     <button type="submit">
@@ -54,7 +54,7 @@
           password: form.password.value,
           first_name: form.first_name.value,
           last_name: form.last_name.value,
-          nick_name: form.nick_name.value,
+          telegram_account: form.telegram_account.value.replace(/^@/, ''),
         };
 
         const registerResponse = await fetch('/auth/register', {
@@ -80,7 +80,7 @@
           });
 
           if (loginResponse.ok) {
-            window.location.href = '/';
+            window.location.href = '/profile';
           } else {
             errorDiv.textContent = 'Login failed after registration';
             errorDiv.style.display = 'block';

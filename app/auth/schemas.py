@@ -5,7 +5,7 @@ from fastapi_users import schemas
 class UserRead(schemas.BaseUser[int]):
     first_name: str
     last_name: str
-    nick_name: str
+    telegram_account: str
 
     class Config:
         from_attributes = True
@@ -14,7 +14,7 @@ class UserRead(schemas.BaseUser[int]):
 class UserCreate(schemas.BaseUserCreate):
     first_name: str
     last_name: str
-    nick_name: str
+    telegram_account: str
 
     class Config:
         from_attributes = True
@@ -23,4 +23,5 @@ class UserCreate(schemas.BaseUserCreate):
 class UserUpdate(schemas.BaseUserUpdate):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
-    nick_name: Optional[str] = None
+    telegram_account: Optional[str] = None
+    telegram_id: Optional[str] = None

@@ -22,7 +22,6 @@ router = APIRouter(
 )
 
 
-
 @router.websocket("/ws/{current_user_id}/{other_user_id}")
 async def websocket_endpoint(
         websocket: WebSocket,
@@ -31,7 +30,9 @@ async def websocket_endpoint(
         db: AsyncSession = DEFAULT_DB,
 ):
     room_id = manager.get_chat_room_id(current_user_id, other_user_id)
-    await manager.connect(websocket, room_id)
+    await manager.connect(websocket, room_id, user_id=current_user_id)
+
+
 
     try:
         while True:
@@ -47,8 +48,14 @@ async def websocket_endpoint(
             await db.commit()
             formatted_message = f"User {current_user_id}: {message.message}"
             await manager.broadcast_to_room(formatted_message, room_id)
+
+            if not manager.is_user_online(other_user_id):
+                error = "The other user is currently offline."
+                message = f"User {current_user_id}: {error}"
+                await manager.broadcast_to_room(message, room_id)
+
     except WebSocketDisconnect:
-        manager.disconnect(websocket, room_id)
+        manager.disconnect(websocket, room_id, current_user_id)
 
 @router.get("")
 async def all_chat_rooms(
