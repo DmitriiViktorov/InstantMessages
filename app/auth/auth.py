@@ -1,6 +1,10 @@
 import redis.asyncio
 from fastapi_users import FastAPIUsers
-from fastapi_users.authentication import CookieTransport, RedisStrategy, AuthenticationBackend
+from fastapi_users.authentication import (
+    CookieTransport,
+    RedisStrategy,
+    AuthenticationBackend,
+)
 
 from .models import User
 from .manager import get_user_manager

@@ -6,39 +6,40 @@
 
 {% block content %}
    <div class="chat-layout">
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h2>Chats</h2>
-            </div>
-            <div class="chat-list">
-                {% for chat in chats %}
-                    <a href="/chat/{{ current_user_id }}/{{ chat.chat_id }}"
-                       class="chat-item {% if chat.chat_id == other_user_id %}active{% endif %}">
-                        <div class="chat-item-info">
-                            <div class="chat-item-top">
-                                <span class="chat-item-name">{{ chat.nick_name }}</span>
-                                {% if chat.last_message %}
-                                    <span class="chat-item-time">
-                                        {{ chat.last_message.created_at | time_format }}
-                                    </span>
-                                {% endif %}
-                            </div>
-                            <div class="chat-item-message">
-                                {% if chat.last_message %}
-                                    {{ chat.last_message.message[:20] }}{% if chat.last_message.message|length > 20 %}...{% endif %}
-                                {% else %}
-                                  No messages yet.
-                                {% endif %}
-                            </div>
-                        </div>
-                    </a>
-                {% endfor %}
-            </div>
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h2>Chats</h2>
         </div>
+        <div class="chat-list">
+          {% for chat in chats %}
+            <a href="/chat/{{ current_user_id }}/{{ chat.chat_id }}"
+             class="chat-item {% if chat.chat_id == other_user_id %}active{% endif %}">
+            <div class="chat-item-info">
+              <div class="chat-item-top">
+                <span class="chat-item-name">{{ chat.telegram_account }}</span>
+                {% if chat.last_message %}
+                  <span class="chat-item-time">
+                    {{ chat.last_message.created_at | time_format }}
+                  </span>
+                {% endif %}
+              </div>
+              <div class="chat-item-message">
+                {% if chat.last_message %}
+                  {{ chat.last_message.message[:20] }}{% if chat.last_message.message|length > 20 %}...{% endif %}
+                {% else %}
+                  No messages yet.
+                {% endif %}
+              </div>
+            </div>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
 
         <div class="chat-main">
             <div class="chat-header">
-                <h2>{{ other_user.nick_name }}</h2>
+                <h2>{{ other_user.telegram_account }}</h2>
+
             </div>
             <div id="chat-container">
                 <div id="messages">
@@ -54,6 +55,8 @@
                     <button type="submit">Send</button>
                 </form>
             </div>
+            <button id="downloadHistoryButton" onclick="downloadChatHistory()">Скачать историю переписки</button>
+
         </div>
     </div>
 
@@ -106,6 +109,41 @@
         window.onload = function() {
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
+
+        function downloadChatHistory() {
+          fetch(`/chat/{{ current_user_id }}/{{ other_user_id }}/download-history`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                  user_id: {{ current_user_id }},
+                  other_user_id: {{ other_user_id }}
+              })
+          })
+          .then(response => {
+              if (response.ok) {
+                  return response.blob();
+              } else {
+                  return response.text().then(text => { throw new Error(`Server responded with status ${response.status}: ${text}`); });
+              }
+          })
+          .then(blob => {
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.style.display = 'none';
+              a.href = url;
+              a.download = `chat_history_{{ current_user_id }}_{{ other_user_id }}.txt`;
+              document.body.appendChild(a);
+              a.click();
+              window.URL.revokeObjectURL(url);
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              alert(error);
+          });
+      }
+
     </script>
 
 {% endblock %}

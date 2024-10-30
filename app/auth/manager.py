@@ -1,4 +1,3 @@
-import uuid
 from typing import Optional, Any
 
 from fastapi import Depends, Request

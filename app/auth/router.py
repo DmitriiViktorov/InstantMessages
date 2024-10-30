@@ -1,7 +1,6 @@
 from typing import Optional
 from fastapi import APIRouter, Request, Depends
 
-
 from .models import User
 from .auth import current_active_user
 

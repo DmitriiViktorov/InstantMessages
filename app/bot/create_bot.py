@@ -3,7 +3,6 @@ from aiogram import Bot, Dispatcher
 
 from config import DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS, BOT_TOKEN
 
-
 tg_bot = Bot(token=BOT_TOKEN)
 
 dp = Dispatcher()

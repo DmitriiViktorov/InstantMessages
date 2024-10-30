@@ -61,3 +61,16 @@ services:
       - web
     networks:
       - mynetwork
+
+  celery:
+    build: .
+    command: celery -A chat.tasks worker --beat --loglevel=info
+    depends_on:
+      - db
+      - cache
+    env_file:
+      - ./app/.env
+    volumes:
+      - ./app:/app
+    networks:
+      - mynetwork

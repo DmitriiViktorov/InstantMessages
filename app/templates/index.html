@@ -6,14 +6,19 @@
 
 {% block content %}
   {% if user %}
-    <h1>Hello {{ user.full_name }}</h1>
+      <div class="welcome-message">
+        <h1>Welcome back, {{ user.full_name }}!</h1>
+        <p>We're glad to see you again on InstantMessages.</p>
+        <p>Chat with your friends, send messages, and receive notifications through our Telegram bot.</p>
+      </div>
+
   {% else %}
-    <h1>Hello user</h1>
+    <div class="welcome-message">
+      <h1>Welcome to InstantMessages!</h1>
+      <p>This is your platform for instant communication with friends and colleagues.</p>
+      <p>Please register to start exchanging messages and stay connected!</p>
+    </div>
   {% endif %}
 
-  <p>Здесь мы пробуем добавить данные из контекста</p>
-  <br>
-  <p>
-    Если вы видите здесь {{ id }} == 1 верное равенство - значит все хорошо
-  </p>
+
 {% endblock %}

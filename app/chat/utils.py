@@ -4,6 +4,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.models import User
+from sqlalchemy.orm import joinedload
+
 from .models import Message
 
 
@@ -28,7 +30,7 @@ async def get_all_chats(
         db: AsyncSession,
 ):
     chats = []
-    all_users_query = select(User.id, User.nick_name).where(User.id != current_user_id)
+    all_users_query = select(User.id, User.telegram_account).where(User.id != current_user_id)
     all_users_result = await db.execute(all_users_query)
     all_users = all_users_result.fetchall()
 
@@ -43,7 +45,7 @@ async def get_all_chats(
 
         chats.append({
             "chat_id": other_user.id,
-            "nick_name": other_user.nick_name,
+            "telegram_account": other_user.telegram_account,
             "last_message": last_message
         })
 
@@ -62,13 +64,13 @@ async def get_chat_messages(
     messages_query = select(Message).filter(
         ((Message.sender_id == current_user_id) & (Message.receiver_id == other_user_id)) |
         ((Message.sender_id == other_user_id) & (Message.receiver_id == current_user_id))
-    ).order_by(Message.created_at)
+    ).order_by(Message.created_at).options(joinedload(Message.sender),joinedload(Message.receiver))
     result = await db.execute(messages_query)
 
     return result.scalars().all()
 
 
-async def get_other_user(other_user_id: int, db: AsyncSession):
-    other_user_query = select(User).where(User.id == other_user_id)
+async def get_user_by_id(user_id: int, db: AsyncSession):
+    other_user_query = select(User).where(User.id == user_id)
     other_user_result = await db.execute(other_user_query)
     return other_user_result.scalar_one_or_none()

@@ -3,22 +3,21 @@ from fastapi import FastAPI, Request, Depends
 
 from starlette.staticfiles import StaticFiles
 
+from templates_config import templates
+
+from contextlib import asynccontextmanager
+
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+
+from redis import asyncio as aioredis
+
 from database import engine, SessionLocal
 from chat.router import router as router_chat
 from auth.router import router as auth_router
 from auth.auth import auth_backend, fastapi_users
 from auth.schemas import UserRead, UserCreate, UserUpdate
 from auth.models import User
-
-from templates_config import templates
-
-from contextlib import asynccontextmanager
-
-
-from fastapi_cache import FastAPICache
-from fastapi_cache.backends.redis import RedisBackend
-
-from redis import asyncio as aioredis
 
 
 @asynccontextmanager
