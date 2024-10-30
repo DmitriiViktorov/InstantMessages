@@ -1,5 +1,5 @@
 # Сервис обмена мгновенными сообщениями
-![instant-messages-logo](app/static/logo.jpg)
+![instant-messages-logo](app/static/logo.png)
 
 Сервис обмена мгновенными сообщениями
 
