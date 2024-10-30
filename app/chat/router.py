@@ -62,7 +62,6 @@ async def websocket_endpoint(
             await manager.broadcast_to_room(formatted_message, room_id)
 
             if not manager.is_user_online(other_user_id):
-                # await manager.broadcast_to_room("User is offline", room_id)
                 notification.delay(
                     current_user_full_name=current_user.full_name,
                     other_user_telegram_id=other_user.telegram_id,
