@@ -1,17 +1,14 @@
 from typing import Optional
 from fastapi import FastAPI, Request, Depends
-
-from starlette.staticfiles import StaticFiles
-
-from templates_config import templates
-
-from contextlib import asynccontextmanager
-
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-
+from starlette.staticfiles import StaticFiles
+from contextlib import asynccontextmanager
 from redis import asyncio as aioredis
+from alembic import command
+from alembic.config import Config
 
+from templates_config import templates
 from database import engine, SessionLocal
 from chat.router import router as router_chat
 from auth.router import router as auth_router
@@ -22,6 +19,9 @@ from auth.models import User
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    alembic_cfg = Config("alembic.ini")
+    command.upgrade(alembic_cfg, "head")
+
     redis = aioredis.from_url("redis://cache:6379")
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     yield

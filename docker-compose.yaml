@@ -1,4 +1,4 @@
-version: '1.1'
+version: '3.8'
 
 networks:
   mynetwork:
@@ -6,12 +6,11 @@ networks:
 
 volumes:
   media:
-
+  postgres_data:
 
 services:
-
   cache:
-    image: redis
+    image: redis:alpine
     restart: always
     volumes:
       - ./data/cache:/data
@@ -21,10 +20,10 @@ services:
       - mynetwork
 
   db:
-    image: postgres
+    image: postgres:13
     restart: always
     volumes:
-      - ./data/db:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
@@ -33,12 +32,17 @@ services:
       - "5432:5432"
     networks:
       - mynetwork
-
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   web:
     build: .
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
       - '5050:5050'
     networks:
@@ -48,7 +52,6 @@ services:
       - media:/app/media
     env_file:
       - ./app/.env
-
 
   nginx:
     image: nginx:alpine
@@ -63,15 +66,3 @@ services:
     networks:
       - mynetwork
 
-#  celery:
-#    build: .
-#    command: celery -A chat.tasks worker --beat --loglevel=info
-#    depends_on:
-#      - db
-#      - cache
-#    env_file:
-#      - ./app/.env
-#    volumes:
-#      - ./app:/app
-#    networks:
-#      - mynetwork

@@ -1,4 +1,6 @@
 .venv
 data/db
 recreate.sh
-app/.env
+.env
+*.env
+!.env.example
