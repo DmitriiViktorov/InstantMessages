@@ -1,17 +1,15 @@
+import asyncio
 from typing import Optional
 from fastapi import FastAPI, Request, Depends
-
-from starlette.staticfiles import StaticFiles
-
-from templates_config import templates
-
-from contextlib import asynccontextmanager
-
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-
+from starlette.staticfiles import StaticFiles
+from contextlib import asynccontextmanager
 from redis import asyncio as aioredis
+from alembic import command
+from alembic.config import Config
 
+from templates_config import templates
 from database import engine, SessionLocal
 from chat.router import router as router_chat
 from auth.router import router as auth_router
@@ -20,8 +18,18 @@ from auth.schemas import UserRead, UserCreate, UserUpdate
 from auth.models import User
 
 
+async def run_async_migrations():
+    def sync_upgrade():
+        alembic_cfg = Config("alembic.ini")
+        command.upgrade(alembic_cfg, "head")
+
+    await asyncio.to_thread(sync_upgrade)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    await run_async_migrations()
+
     redis = aioredis.from_url("redis://cache:6379")
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     yield
