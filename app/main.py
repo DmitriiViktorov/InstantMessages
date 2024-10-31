@@ -1,3 +1,4 @@
+import asyncio
 from typing import Optional
 from fastapi import FastAPI, Request, Depends
 from fastapi_cache import FastAPICache
@@ -17,10 +18,17 @@ from auth.schemas import UserRead, UserCreate, UserUpdate
 from auth.models import User
 
 
+async def run_async_migrations():
+    def sync_upgrade():
+        alembic_cfg = Config("alembic.ini")
+        command.upgrade(alembic_cfg, "head")
+
+    await asyncio.to_thread(sync_upgrade)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    alembic_cfg = Config("alembic.ini")
-    command.upgrade(alembic_cfg, "head")
+    await run_async_migrations()
 
     redis = aioredis.from_url("redis://cache:6379")
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")

@@ -11,8 +11,6 @@ RUN pip install -r requirements.txt
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-COPY .env /app/.env
-
 COPY ./app /app
 
 CMD ["/usr/bin/supervisord"]

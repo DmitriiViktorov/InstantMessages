@@ -51,7 +51,7 @@ services:
       - ./app:/app
       - media:/app/media
     env_file:
-      - ./app/.env
+      - .env
 
   nginx:
     image: nginx:alpine
