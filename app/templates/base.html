@@ -7,48 +7,51 @@
     	
     {% endblock %}
   </title>
-  {% block style %}
-  	<link href="/static/css/base.css" rel="stylesheet">
-  {% endblock %}
+  <link href="/static/css/base.css" rel="stylesheet">
 
 </head>
 <body>
-  <div class="topnav">
+  <div class="topnav" id="auth-user" style="display: none;">
     <a class="active" href="{{ url_for('home') }}">Home</a>
-    {% if user %}
-    	<a href="/profile">Your profile</a>
-      <a href="/chat">Chats</a>
-      <a href="/logout">Log out</a>
-    {% else %}
-      <a href="/login">Login</a>
-      <a href="/register">Register</a>
-    {% endif %}
+    <a href="/profile">Your profile</a>
+    <a href="/chat">Chats</a>
+    <a href="/logout">Log out</a>
+  </div>
+
+  <div class="topnav" id="guest-user" style="display: none;">
+    <a class="active" href="{{ url_for('home') }}">Home</a>
+    <a href="/login">Login</a>
+    <a href="/register">Register</a>
   </div>
   {% block content %}
   	
   {% endblock %}
   <div id="toast" class="toast"></div>
 
-  <script>
-      function showToast(message, type = 'error') {
-          const toast = document.getElementById('toast');
-          toast.textContent = message;
-          toast.className = `toast ${type} show`;
+  {% block script %}
+  	<script>
+      async function checkAuthStatus() {
+        try {
+          const response = await fetch("/users/me");
 
-          setTimeout(() => {
-              toast.className = 'toast';
-          }, 5000);
+          if (response.ok) {
+            const user = await response.json();
+            document.getElementById("auth-user").style.display = "block";
+            console.log("Logged in user:", user);
+          } else if (response.status === 401) {
+            document.getElementById("guest-user").style.display = "block";
+          }
+        } catch (error) {
+          console.error("Authorization check failed:", error);
+        }
       }
 
-      document.addEventListener('DOMContentLoaded', () => {
-          const message = '{{ request.headers.get("X-Message", "") }}';
-          const messageType = '{{ request.headers.get("X-Message-Type", "") }}';
-
-          if (message) {
-              showToast(message, messageType);
-          }
-      });
+      checkAuthStatus();
   </script>
+
+  {% endblock %}
+
+
 
 
 </body>
