@@ -22,7 +22,7 @@ from .manager import manager
 from .utils import get_all_chats, get_chat_messages, get_user_by_id
 from .models import Message
 from .tasks import notification
-
+from .schemas import ChatContext
 
 DEFAULT_DB = Depends(get_db)
 
@@ -67,17 +67,28 @@ async def websocket_endpoint(
                     other_user_telegram_id=other_user.telegram_id,
                 )
 
-
     except WebSocketDisconnect:
         manager.disconnect(websocket, room_id, current_user_id)
 
 
-@router.get("")
+@router.get(
+    "",
+    summary="Get all chats",
+    description="Returns a list of all chats for the current user. "
+                "If the user is not logged in, an empty list is returned.",
+    response_model=ChatContext,
+)
 async def all_chat_rooms(
         request: Request,
         db: AsyncSession = DEFAULT_DB,
-        user: Optional[User] = Depends(fastapi_users.current_user(optional=True))
+        user: User = Depends(fastapi_users.current_user(optional=True))
 ):
+    """
+    Returns a list of all chats for the current user.
+    :param request: Request object.
+    :param db: Current database session.
+    :param user: Current user.
+    """
     chats = await get_all_chats(
         current_user_id=user.id,
         db=db

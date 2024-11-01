@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Integer, String
 
-from database import Base, SessionLocal
+from database import Base
 
 
 class User(SQLAlchemyBaseUserTable[int], Base):
@@ -19,12 +19,3 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     def full_name(self) -> str:
         return f"{self.first_name} {self.last_name}"
 
-
-
-async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
-    async with SessionLocal() as session:
-        yield session
-
-
-async def get_user_db(session: AsyncSession = Depends(get_async_session)):
-    yield SQLAlchemyUserDatabase(session, User)
